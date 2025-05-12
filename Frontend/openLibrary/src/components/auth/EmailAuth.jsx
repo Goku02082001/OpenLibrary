@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-hot-toast';
 import { useAuth } from '../../context/AuthContext';
 import { Mail, Lock, User, Loader } from 'lucide-react';
+import { API_URL } from '../../config/config';
 
 const EmailAuth = ({ mode }) => {
   const navigate = useNavigate();
@@ -34,7 +35,7 @@ const EmailAuth = ({ mode }) => {
           return;
         }
 
-        const response = await fetch('/api/auth/register', {
+        const response = await fetch(`${API_URL}/auth/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -55,7 +56,7 @@ const EmailAuth = ({ mode }) => {
         toast.success('Registration successful!');
         navigate('/');
       } else {
-        const response = await fetch('/api/auth/login', {
+        const response = await fetch(`${API_URL}/auth/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
