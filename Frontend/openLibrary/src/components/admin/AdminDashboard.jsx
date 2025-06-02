@@ -15,7 +15,7 @@ const AdminDashboard = () => {
     const fetchBooks = async () => {
       try {
         setIsLoading(true);
-        const { data } = await axios.get(`${API_URL}/books`);
+        const { data } = await axios.get(`${API_URL}/api/books`);
         setBooks(data);
       } catch (error) {
         console.error('Error fetching books:', error);
@@ -31,7 +31,7 @@ const AdminDashboard = () => {
   const handleDeleteBook = async (bookId) => {
     if (window.confirm('Are you sure you want to delete this book?')) {
       try {
-        await axios.delete(`${API_URL}/books/${bookId}`);
+        await axios.delete(`${API_URL}/api/books/${bookId}`);
         setBooks(books.filter(book => book._id !== bookId));
         toast.success('Book deleted successfully');
       } catch (error) {
@@ -137,7 +137,7 @@ const AdminDashboard = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
                         <a
-                          href={`http://localhost:5000${book.fileUrl}`}
+                          href={`https://openlibrary-2.onrender.com${book.fileUrl}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-indigo-600 hover:text-indigo-900"

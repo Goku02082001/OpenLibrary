@@ -85,7 +85,7 @@ const BookUploadForm = () => {
 
       
       
-      await axios.post(`${API_URL}/books/`, uploadData, {
+      await axios.post(`${API_URL}/api/books/`, uploadData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
