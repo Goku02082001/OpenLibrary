@@ -14,7 +14,7 @@ const BookReaderPage = () => {
     const fetchBook = async () => {
       try {
         setIsLoading(true);
-        const { data } = await axios.get(`${API_URL}/books/${bookId}`);
+        const { data } = await axios.get(`${API_URL}/api/books/${bookId}`);
         setBook(data);
       } catch (err) {
         setError('Failed to load book. Please try again later.');
@@ -91,7 +91,7 @@ const BookReaderPage = () => {
 
           <div className="w-full h-[calc(100vh-300px)] bg-gray-100">
             <iframe
-              src={`http://localhost:5000${book.fileUrl}`}
+              src={`https://openlibrary-2.onrender.com${book.fileUrl}`}
               title={book.title}
               className="w-full h-full"
               style={{ border: 'none' }}

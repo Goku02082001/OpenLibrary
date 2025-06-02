@@ -45,7 +45,7 @@ export const AuthProvider = ({ children }) => {
       let data;
 
       if (response.credential) {
-        const res = await axios.post(`${API_URL}/auth/google`, {
+        const res = await axios.post(`${API_URL}/api/auth/google`, {
           token: response.credential,
         });
         data = res.data;
