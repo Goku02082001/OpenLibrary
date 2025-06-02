@@ -17,7 +17,7 @@ const BookList = () => {
     const fetchBooks = async () => {
       try {
         setIsLoading(true);
-        const { data } = await axios.get(`${API_URL}/books`);
+        const { data } = await axios.get(`${API_URL}/api/books`);
         setBooks(data);
         setFilteredBooks(data);
       } catch (err) {
