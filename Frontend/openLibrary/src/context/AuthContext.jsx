@@ -25,7 +25,7 @@ export const AuthProvider = ({ children }) => {
         const token = localStorage.getItem('token');
         if (token) {
           axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-          const { data } = await axios.get(`${API_URL}api/auth/me`);
+          const { data } = await axios.get(`${API_URL}/api/auth/me`);
           setUser(data.user);
           setIsAuthenticated(true);
         }
