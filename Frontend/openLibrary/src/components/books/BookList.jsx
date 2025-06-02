@@ -97,7 +97,7 @@ const BookList = () => {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {filteredBooks.map((book) => (
-            <BookCard key={book._id} book={book} />
+            <BookCard id={book._id} book={book} />
           ))}
         </div>
       )}

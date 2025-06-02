@@ -16,10 +16,21 @@ import UnauthorizedPage from './pages/UnauthorizedPage';
 
 
 import ProtectedRoute from './components/common/ProtectedRoute';
+import BookReaderPage from './pages/BookReaderPage';
+
+
+const NotFoundPage = () => {
+  return (
+    <div className="min-h-screen flex items-center justify-center">
+      <h1 className="text-3xl font-bold text-gray-800">404 - Page Not Found</h1>
+    </div>
+  );
+};
 
 function App() {
   return (
     <AuthProvider>
+
       <Router>
         <Layout>
           <Routes>
@@ -35,6 +46,14 @@ function App() {
               } 
             />
             <Route 
+              path="/uploads/books/:bookId" 
+              element={
+                // <ProtectedRoute requireAdmin>
+                 <BookReaderPage/>
+                //  </ProtectedRoute>
+              } 
+            />
+            <Route 
               path="/admin/books/new" 
               element={
                 <ProtectedRoute requireAdmin>
@@ -42,11 +61,21 @@ function App() {
                 </ProtectedRoute>
               } 
             />
+            <Route 
+              path="/admin/books/edit/:id" 
+              element={
+                <ProtectedRoute requireAdmin>
+                  <BookUploadPage />
+                </ProtectedRoute>
+              } 
+            />
             <Route path="/unauthorized" element={<UnauthorizedPage />} />
+            <Route path="*" element={<NotFoundPage />} />
           </Routes>
         </Layout>
         <Toaster position="top-right" />
       </Router>
+
     </AuthProvider>
   );
 }

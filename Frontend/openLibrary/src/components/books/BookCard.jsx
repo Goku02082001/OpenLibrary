@@ -1,7 +1,10 @@
 import React from 'react';
 import { FileText, Calendar } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-const BookCard = ({ book }) => {
+const BookCard = ({id,book }) => {
+    console.log(id)
+    const navigate = useNavigate()
   const getGenreStyles = (genre) => {
     switch (genre) {
       case 'Religious':
@@ -79,14 +82,12 @@ const BookCard = ({ book }) => {
             <span>{formatDate(book.createdAt)}</span>
           </div>
 
-          <a
-            href={book.fileUrl}
-            target="_blank"
-            rel="noopener noreferrer"
+          <button
+            onClick={()=>navigate(`/uploads/books/${id}`)}
             className="inline-flex items-center justify-center px-3 py-1 border border-transparent text-xs font-medium rounded text-white bg-blue-900 hover:bg-blue-800 transition-colors"
           >
             Read
-          </a>
+          </button>
         </div>
       </div>
     </div>

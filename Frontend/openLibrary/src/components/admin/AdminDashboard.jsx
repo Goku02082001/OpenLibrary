@@ -137,7 +137,7 @@ const AdminDashboard = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
                         <a
-                          href={book.fileUrl}
+                          href={`http://localhost:5000${book.fileUrl}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="text-indigo-600 hover:text-indigo-900"

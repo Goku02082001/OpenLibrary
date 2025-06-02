@@ -8,11 +8,11 @@ import { authenticate, isAdmin } from '../middelware/auth.js';
 
 const router = express.Router();
 
-
+// Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-
+// Create uploads directory if it doesn't exist
 const uploadsDir = path.join(__dirname, '../uploads');
 const booksDir = path.join(uploadsDir, 'books');
 const coversDir = path.join(uploadsDir, 'covers');
@@ -27,7 +27,7 @@ if (!fs.existsSync(coversDir)) {
   fs.mkdirSync(coversDir);
 }
 
-
+// Configure multer storage
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     if (file.fieldname === 'coverImage') {
@@ -43,7 +43,7 @@ const storage = multer.diskStorage({
   },
 });
 
-
+// File filter for uploads
 const fileFilter = (req, file, cb) => {
   if (file.fieldname === 'coverImage') {
     if (file.mimetype.startsWith('image/')) {
@@ -62,75 +62,59 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-
+// Set up multer upload
 const upload = multer({ 
   storage: storage,
   fileFilter: fileFilter,
   limits: {
-    fileSize: 20 * 1024 * 1024, 
+    fileSize: 20 * 1024 * 1024, // 20MB max file size
   }
 });
 
-
+// Handle multiple file uploads
 const uploadFiles = upload.fields([
   { name: 'coverImage', maxCount: 1 },
   { name: 'bookFile', maxCount: 1 }
 ]);
 
-
+// @route   GET /api/books
+// @desc    Get all books
+// @access  Public
 router.get('/', async (req, res) => {
   try {
-    const books = await Book.find().sort({ createdAt: -1 });
+    const books = await Book.find()
+      .sort({ createdAt: -1 })
+      .populate('uploadedBy', 'name email');
     
-    
-    const formattedBooks = books.map(book => ({
-      _id: book._id,
-      title: book.title,
-      author: book.author,
-      description: book.description,
-      genre: book.genre,
-      coverImage: book.coverImage,
-      fileUrl: book.fileUrl,
-      uploadedBy: book.uploadedBy,
-      createdAt: book.createdAt,
-      updatedAt: book.updatedAt,
-    }));
-    
-    res.json(formattedBooks);
+    res.json(books);
   } catch (error) {
     console.error('Error fetching books:', error);
     res.status(500).json({ error: 'Failed to fetch books' });
   }
 });
 
-
+// @route   GET /api/books/:id
+// @desc    Get a book by ID
+// @access  Public
 router.get('/:id', async (req, res) => {
   try {
-    const book = await Book.findById(req.params.id);
+    const book = await Book.findById(req.params.id)
+      .populate('uploadedBy', 'name email');
     
     if (!book) {
       return res.status(404).json({ error: 'Book not found' });
     }
     
-    res.json({
-      _id: book._id,
-      title: book.title,
-      author: book.author,
-      description: book.description,
-      genre: book.genre,
-      coverImage: book.coverImage,
-      fileUrl: book.fileUrl,
-      uploadedBy: book.uploadedBy,
-      createdAt: book.createdAt,
-      updatedAt: book.updatedAt,
-    });
+    res.json(book);
   } catch (error) {
     console.error('Error fetching book:', error);
     res.status(500).json({ error: 'Failed to fetch book' });
   }
 });
 
-
+// @route   POST /api/books
+// @desc    Create a new book
+// @access  Private/Admin
 router.post('/', authenticate, isAdmin, (req, res) => {
   uploadFiles(req, res, async (err) => {
     if (err) {
@@ -145,6 +129,7 @@ router.post('/', authenticate, isAdmin, (req, res) => {
         return res.status(400).json({ error: 'Title and genre are required' });
       }
       
+      // Get file paths
       const bookFile = req.files.bookFile ? req.files.bookFile[0] : null;
       const coverImage = req.files.coverImage ? req.files.coverImage[0] : null;
       
@@ -152,7 +137,7 @@ router.post('/', authenticate, isAdmin, (req, res) => {
         return res.status(400).json({ error: 'Book file is required' });
       }
       
-     
+      // Create new book
       const newBook = new Book({
         title,
         author,
@@ -165,18 +150,7 @@ router.post('/', authenticate, isAdmin, (req, res) => {
       
       await newBook.save();
       
-      res.status(201).json({
-        _id: newBook._id,
-        title: newBook.title,
-        author: newBook.author,
-        description: newBook.description,
-        genre: newBook.genre,
-        coverImage: newBook.coverImage,
-        fileUrl: newBook.fileUrl,
-        uploadedBy: newBook.uploadedBy,
-        createdAt: newBook.createdAt,
-        updatedAt: newBook.updatedAt,
-      });
+      res.status(201).json(newBook);
     } catch (error) {
       console.error('Book creation error:', error);
       res.status(500).json({ error: 'Failed to create book' });
@@ -184,7 +158,9 @@ router.post('/', authenticate, isAdmin, (req, res) => {
   });
 });
 
-
+// @route   DELETE /api/books/:id
+// @desc    Delete a book
+// @access  Private/Admin
 router.delete('/:id', authenticate, isAdmin, async (req, res) => {
   try {
     const book = await Book.findById(req.params.id);
@@ -193,7 +169,7 @@ router.delete('/:id', authenticate, isAdmin, async (req, res) => {
       return res.status(404).json({ error: 'Book not found' });
     }
     
-   
+    // Delete files from server
     if (book.coverImage) {
       const coverPath = path.join(__dirname, '..', book.coverImage);
       if (fs.existsSync(coverPath)) {
@@ -208,7 +184,7 @@ router.delete('/:id', authenticate, isAdmin, async (req, res) => {
       }
     }
     
-   
+    // Delete book from database
     await Book.findByIdAndDelete(req.params.id);
     
     res.json({ message: 'Book deleted successfully' });

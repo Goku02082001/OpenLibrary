@@ -1,28 +1,36 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { toast } from 'react-hot-toast';
-import { Upload, Loader, X } from 'lucide-react';
-import { GENRES, API_URL } from '../../config/config';
-
+import React, { useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { toast } from "react-hot-toast";
+import { Upload, Loader, X } from "lucide-react";
+import { GENRES, API_URL } from "../../config/config";
 const BookUploadForm = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    title: '',
-    author: '',
-    genre: '',
-    description: '',
+    title: "",
+    author: "",
+    genre: "",
+    description: "",
   });
 
   const [coverImage, setCoverImage] = useState(null);
   const [bookFile, setBookFile] = useState(null);
   const [coverPreview, setCoverPreview] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const fileInputRef = useRef(null);
+  const bookInputRef = useRef(null);
+  const handleDivClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleBookDivClick = () => {
+    bookInputRef.current?.click();
+  };
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleCoverChange = (e) => {
@@ -48,12 +56,12 @@ const BookUploadForm = () => {
     e.preventDefault();
 
     if (!bookFile) {
-      toast.error('Please upload a book file');
+      toast.error("Please upload a book file");
       return;
     }
 
     if (!formData.title || !formData.genre) {
-      toast.error('Title and genre are required');
+      toast.error("Title and genre are required");
       return;
     }
 
@@ -61,34 +69,34 @@ const BookUploadForm = () => {
       setIsSubmitting(true);
 
       const uploadData = new FormData();
-      uploadData.append('title', formData.title);
-      uploadData.append('genre', formData.genre);
+      uploadData.append("title", formData.title);
+      uploadData.append("genre", formData.genre);
 
       if (formData.author) {
-        uploadData.append('author', formData.author);
+        uploadData.append("author", formData.author);
       }
 
       if (formData.description) {
-        uploadData.append('description', formData.description);
+        uploadData.append("description", formData.description);
       }
 
       if (coverImage) {
-        uploadData.append('coverImage', coverImage);
+        uploadData.append("coverImage", coverImage);
       }
 
-      uploadData.append('bookFile', bookFile);
+      uploadData.append("bookFile", bookFile);
 
       await axios.post(`${API_URL}/books`, uploadData, {
         headers: {
-          'Content-Type': 'multipart/form-data',
+          "Content-Type": "multipart/form-data",
         },
       });
 
-      toast.success('Book uploaded successfully!');
-      navigate('/books');
+      toast.success("Book uploaded successfully!");
+      navigate("/books");
     } catch (error) {
-      console.error('Error uploading book:', error);
-      toast.error('Failed to upload book. Please try again.');
+      console.error("Error uploading book:", error);
+      toast.error("Failed to upload book. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -104,7 +112,10 @@ const BookUploadForm = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <div className="mb-4">
-            <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="title"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Book Title <span className="text-red-500">*</span>
             </label>
             <input
@@ -120,7 +131,10 @@ const BookUploadForm = () => {
           </div>
 
           <div className="mb-4">
-            <label htmlFor="author" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="author"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Author
             </label>
             <input
@@ -135,7 +149,10 @@ const BookUploadForm = () => {
           </div>
 
           <div className="mb-4">
-            <label htmlFor="genre" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="genre"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Genre <span className="text-red-500">*</span>
             </label>
             <select
@@ -146,15 +163,22 @@ const BookUploadForm = () => {
               required
               className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-900"
             >
-              <option value="" disabled>Select a genre</option>
-              {GENRES.map(genre => (
-                <option key={genre} value={genre}>{genre}</option>
+              <option value="" disabled>
+                Select a genre
+              </option>
+              {GENRES.map((genre) => (
+                <option key={genre} value={genre}>
+                  {genre}
+                </option>
               ))}
             </select>
           </div>
 
           <div className="mb-4">
-            <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-1">
+            <label
+              htmlFor="description"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
               Description
             </label>
             <textarea
@@ -176,9 +200,9 @@ const BookUploadForm = () => {
             </label>
             {coverPreview ? (
               <div className="relative w-full aspect-[2/3] overflow-hidden rounded-md border border-gray-300">
-                <img 
-                  src={coverPreview} 
-                  alt="Cover preview" 
+                <img
+                  src={coverPreview}
+                  alt="Cover preview"
                   className="w-full h-full object-cover"
                 />
                 <button
@@ -190,17 +214,25 @@ const BookUploadForm = () => {
                 </button>
               </div>
             ) : (
-              <div className="border-2 border-dashed border-gray-300 rounded-md p-6 flex flex-col items-center justify-center">
-                <Upload className="h-10 w-10 text-gray-400 mb-2" />
-                <p className="text-sm text-gray-500 mb-2">Click to upload cover image</p>
-                <p className="text-xs text-gray-400">PNG, JPG or JPEG (Max. 2MB)</p>
+              <div
+                className="  border-2 border-dashed border-gray-300 rounded-md p-6 flex flex-col items-center justify-center cursor-pointer"
+                onClick={handleDivClick}
+              >
+                <Upload className=" text-gray-400 mb-2" />
+                <p className="text-sm text-gray-500 mb-2">
+                  Click to upload cover image
+                </p>
+                <p className="text-xs text-gray-400">
+                  PNG, JPG or JPEG (Max. 2MB)
+                </p>
                 <input
+                  ref={fileInputRef}
                   type="file"
                   id="coverImage"
                   name="coverImage"
                   onChange={handleCoverChange}
                   accept="image/png, image/jpeg, image/jpg"
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  className="hidden"
                 />
               </div>
             )}
@@ -210,13 +242,23 @@ const BookUploadForm = () => {
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Book File (PDF) <span className="text-red-500">*</span>
             </label>
-            <div className={`border-2 ${bookFile ? 'border-green-300 bg-green-50' : 'border-dashed border-gray-300'} rounded-md p-6 flex flex-col items-center justify-center`}>
+            <div
+              className={`border-2 ${
+                bookFile
+                  ? "border-green-300 bg-green-50"
+                  : "border-dashed border-gray-300"
+              } 
+    rounded-md p-6 flex flex-col items-center justify-center cursor-pointer`}
+              onClick={handleBookDivClick}
+            >
               {bookFile ? (
                 <div className="text-center">
                   <div className="bg-green-100 rounded-full p-2 inline-flex items-center justify-center mb-2">
                     <Upload className="h-6 w-6 text-green-600" />
                   </div>
-                  <p className="text-sm font-medium text-gray-700">{bookFile.name}</p>
+                  <p className="text-sm font-medium text-gray-700">
+                    {bookFile.name}
+                  </p>
                   <p className="text-xs text-gray-500 mt-1">
                     {(bookFile.size / (1024 * 1024)).toFixed(2)} MB
                   </p>
@@ -231,17 +273,22 @@ const BookUploadForm = () => {
               ) : (
                 <>
                   <Upload className="h-10 w-10 text-gray-400 mb-2" />
-                  <p className="text-sm text-gray-500 mb-2">Click to upload PDF file</p>
-                  <p className="text-xs text-gray-400">PDF files only (Max. 20MB)</p>
+                  <p className="text-sm text-gray-500 mb-2">
+                    Click to upload PDF file
+                  </p>
+                  <p className="text-xs text-gray-400">
+                    PDF files only (Max. 20MB)
+                  </p>
                 </>
               )}
               <input
+                ref={bookInputRef}
                 type="file"
                 id="bookFile"
                 name="bookFile"
                 onChange={handleBookFileChange}
                 accept="application/pdf"
-                className={`absolute inset-0 w-full h-full opacity-0 cursor-pointer ${bookFile ? 'pointer-events-none' : ''}`}
+                className="hidden"
                 required
               />
             </div>
@@ -252,7 +299,7 @@ const BookUploadForm = () => {
       <div className="flex justify-end space-x-4">
         <button
           type="button"
-          onClick={() => navigate('/admin')}
+          onClick={() => navigate("/admin")}
           className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
         >
           Cancel
@@ -268,7 +315,7 @@ const BookUploadForm = () => {
               Uploading...
             </>
           ) : (
-            'Upload Book'
+            "Upload Book"
           )}
         </button>
       </div>
