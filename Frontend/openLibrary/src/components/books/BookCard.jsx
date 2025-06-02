@@ -46,7 +46,7 @@ const BookCard = ({id,book }) => {
           <img
             src={book.coverImage}
             alt={book.title}
-            className="absolute top-0 left-0 w-full h-full object-cover"
+             className="absolute top-0 left-0 w-full h-full object-cover"
           />
         ) : (
           <div className="absolute top-0 left-0 w-full h-full bg-gray-200 flex items-center justify-center">

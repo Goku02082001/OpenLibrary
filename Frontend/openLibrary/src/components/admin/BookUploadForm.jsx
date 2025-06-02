@@ -18,7 +18,8 @@ const BookUploadForm = () => {
   const [bookFile, setBookFile] = useState(null);
   const [coverPreview, setCoverPreview] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const fileInputRef = useRef(null);
+  const [coverUrl, setCoverUrl] = useState("");
+
   const bookInputRef = useRef(null);
   const handleDivClick = () => {
     fileInputRef.current?.click();
@@ -33,17 +34,10 @@ const BookUploadForm = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleCoverChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setCoverImage(file);
-
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setCoverPreview(reader.result);
-      };
-      reader.readAsDataURL(file);
-    }
+  const handleCoverUrlChange = (e) => {
+    const url = e.target.value;
+    setCoverUrl(url);
+    setCoverPreview(url);
   };
 
   const handleBookFileChange = (e) => {
@@ -195,47 +189,43 @@ const BookUploadForm = () => {
 
         <div>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">
-              Cover Image
+            <label
+              htmlFor="coverUrl"
+              className="block text-sm font-medium text-gray-700 mb-1"
+            >
+              Cover Image URL <span className="text-red-500">*</span>
             </label>
+
             {coverPreview ? (
-              <div className="relative w-full aspect-[2/3] overflow-hidden rounded-md border border-gray-300">
+              <div className="relative w-full aspect-[2/3] overflow-hidden rounded-md border border-gray-300 mb-2">
                 <img
                   src={coverPreview}
-                  alt="Cover preview"
+                  alt="Cover Preview"
                   className="w-full h-full object-cover"
                 />
                 <button
                   type="button"
-                  onClick={removeCoverPreview}
+                  onClick={() => {
+                    setCoverPreview(null);
+                    setCoverUrl("");
+                  }}
                   className="absolute top-2 right-2 bg-white rounded-full p-1 shadow-md"
                 >
                   <X className="h-4 w-4 text-gray-600" />
                 </button>
               </div>
-            ) : (
-              <div
-                className="  border-2 border-dashed border-gray-300 rounded-md p-6 flex flex-col items-center justify-center cursor-pointer"
-                onClick={handleDivClick}
-              >
-                <Upload className=" text-gray-400 mb-2" />
-                <p className="text-sm text-gray-500 mb-2">
-                  Click to upload cover image
-                </p>
-                <p className="text-xs text-gray-400">
-                  PNG, JPG or JPEG (Max. 2MB)
-                </p>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  id="coverImage"
-                  name="coverImage"
-                  onChange={handleCoverChange}
-                  accept="image/png, image/jpeg, image/jpg"
-                  className="hidden"
-                />
-              </div>
-            )}
+            ) : null}
+
+            <input
+              type="text"
+              id="coverUrl"
+              name="coverUrl"
+              value={coverUrl}
+              onChange={handleCoverUrlChange}
+              placeholder="https://example.com/image.jpg"
+              required
+              className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-900"
+            />
           </div>
 
           <div className="mb-4">
