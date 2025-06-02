@@ -3,7 +3,7 @@ import { FileText, Calendar } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 const BookCard = ({id,book }) => {
-    console.log(id)
+    // console.log(id)
     const navigate = useNavigate()
   const getGenreStyles = (genre) => {
     switch (genre) {

@@ -115,48 +115,47 @@ router.get('/:id', async (req, res) => {
 // @route   POST /api/books
 // @desc    Create a new book
 // @access  Private/Admin
-router.post('/', authenticate, isAdmin, (req, res) => {
-  uploadFiles(req, res, async (err) => {
+router.post('/', authenticate, isAdmin, (req, res, next) => {
+  uploadFiles(req, res, (err) => {
     if (err) {
-      console.error('Upload error:', err);
       return res.status(400).json({ error: err.message });
     }
-    
-    try {
-      const { title, author, description, genre } = req.body;
-      
-      if (!title || !genre) {
-        return res.status(400).json({ error: 'Title and genre are required' });
-      }
-      
-      // Get file paths
-      const bookFile = req.files.bookFile ? req.files.bookFile[0] : null;
-      const coverImage = req.files.coverImage ? req.files.coverImage[0] : null;
-      
-      if (!bookFile) {
-        return res.status(400).json({ error: 'Book file is required' });
-      }
-      
-      // Create new book
-      const newBook = new Book({
-        title,
-        author,
-        description,
-        genre,
-        coverImage: coverImage ? `/uploads/covers/${path.basename(coverImage.path)}` : null,
-        fileUrl: `/uploads/books/${path.basename(bookFile.path)}`,
-        uploadedBy: req.user._id,
-      });
-      
-      await newBook.save();
-      
-      res.status(201).json(newBook);
-    } catch (error) {
-      console.error('Book creation error:', error);
-      res.status(500).json({ error: 'Failed to create book' });
-    }
+    next();
   });
+}, async (req, res) => {
+  const { title, author, description, genre, coverImage } = req.body;
+
+  if (!title || !genre) {
+    return res.status(400).json({ error: 'Title and genre are required' });
+  }
+
+  const bookFile = req.files && req.files.bookFile ? req.files.bookFile[0] : null;
+  if (!bookFile) {
+    return res.status(400).json({ error: 'Book file is required' });
+  }
+
+  let coverImageUrl = null;
+  if (req.files && req.files.coverImage && req.files.coverImage.length > 0) {
+    coverImageUrl = `/uploads/covers/${path.basename(req.files.coverImage[0].path)}`;
+  } else if (coverImage && typeof coverImage === 'string' && coverImage.startsWith('http')) {
+    coverImageUrl = coverImage;
+  }
+
+  const newBook = new Book({
+    title,
+    author,
+    description,
+    genre,
+    coverImage: coverImageUrl,
+    fileUrl: `/uploads/books/${path.basename(bookFile.path)}`,
+    uploadedBy: req.user._id,
+  });
+
+  await newBook.save();
+
+  res.status(201).json(newBook);
 });
+
 
 // @route   DELETE /api/books/:id
 // @desc    Delete a book

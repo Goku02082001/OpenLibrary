@@ -36,7 +36,9 @@ const BookUploadForm = () => {
 
   const handleCoverUrlChange = (e) => {
     const url = e.target.value;
+    console.log("url",url)
     setCoverUrl(url);
+    setCoverImage(url)
     setCoverPreview(url);
   };
 
@@ -73,18 +75,22 @@ const BookUploadForm = () => {
       if (formData.description) {
         uploadData.append("description", formData.description);
       }
+      if(coverImage){
 
-      if (coverImage) {
         uploadData.append("coverImage", coverImage);
       }
+      
 
       uploadData.append("bookFile", bookFile);
 
-      await axios.post(`${API_URL}/books`, uploadData, {
+      
+      
+      await axios.post(`${API_URL}/books/`, uploadData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
       });
+      console.log("upload data",uploadData);
 
       toast.success("Book uploaded successfully!");
       navigate("/books");
